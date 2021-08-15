@@ -1,4 +1,5 @@
 import { signIn, signOut, useSession } from 'next-auth/client'
+import { Button } from 'semantic-ui-react'
 
 export default function Page() {
   const [ session, loading ] = useSession()
@@ -6,11 +7,11 @@ export default function Page() {
   return <>
     {!session && <>
       Not signed in <br/>
-      <button onClick={() => signIn()}>Sign in</button>
+      <Button onClick={() => signIn()}>Sign in</Button>
     </>}
     {session && <>
       Signed in as {session.user.email} <br/>
-      <button onClick={() => signOut()}>Sign out</button>
+      <Button onClick={() => signOut()}>Sign out</Button>
     </>}
   </>
 }
