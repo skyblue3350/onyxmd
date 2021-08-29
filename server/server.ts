@@ -9,6 +9,7 @@ import io from 'socket.io'
 import { router as authRouter } from './auth-router'
 import { parse } from 'url'
 import { SessionSocket } from '../@types/socket'
+import { applyDelta } from '../lib/applyDelta'
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -42,9 +43,23 @@ app.prepare().then(async () => {
   // WebSocket
   const ioserver = new io.Server(server, {
   })
+  let data = 'hoge\nfuga'
   ioserver.on('connection', (socket: SessionSocket) => {
     console.log('connect', socket.request.session)
+    socket.emit('doc', data)
+
+    socket.on('insert', (delta) => {
+      const doc = applyDelta(data, delta)
+      socket.broadcast.emit('insert', delta)
+      data = doc
+    })
+    socket.on('remove', (delta) => {
+      const doc = applyDelta(data, delta)
+      socket.broadcast.emit('doc', doc)
+      data = doc
+    })
   })
+
   ioserver.use((socket ,next) => {
     sessionMiddleware(socket.request, {}, next)
   })
