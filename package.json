@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "ace-builds": "^1.4.12",
+    "ace-code-editor": "^1.2.3",
     "cookie-parser": "^1.4.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
@@ -17,6 +19,7 @@
     "passport-github2": "^0.1.12",
     "passport-local": "^1.0.0",
     "react": "17.0.2",
+    "react-ace": "^9.4.3",
     "react-dom": "17.0.2",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.0.3",
