@@ -8,6 +8,7 @@ const AceEdit = dynamic(()=>import('../../components/AceEdit'), {ssr:false})
 import { applyDelta } from '../../lib/applyDelta'
 import Nav from '../../components/nav'
 import { Grid } from 'semantic-ui-react'
+import Markdown from '../../components/markdown'
 
 const Page = () => {
   const router = useRouter()
@@ -50,7 +51,7 @@ const Page = () => {
           setOptions={{useWorker: false}} />
         </Grid.Column>
         <Grid.Column>
-          hoge
+          <Markdown markdown={markdown}/>
         </Grid.Column>
       </Grid>
       
