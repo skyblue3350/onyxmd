@@ -6,6 +6,8 @@ import { useRouter } from 'next/router'
 const AceEdit = dynamic(()=>import('../../components/AceEdit'), {ssr:false})
 
 import { applyDelta } from '../../lib/applyDelta'
+import Nav from '../../components/nav'
+import { Grid } from 'semantic-ui-react'
 
 const Page = () => {
   const router = useRouter()
@@ -36,7 +38,24 @@ const Page = () => {
     }
   })
 
-  return <AceEdit value={markdown} onChange={(value, e) => socketRef.current.emit(e.action, e)} setOptions={{useWorker: false}} />
+  return (
+    <>
+      <Nav />
+      <Grid columns={2} style={{paddingTop: 45}}>
+        <Grid.Column>
+        <AceEdit
+          style={{width: '100%', height: '100vw'}}
+          value={markdown}
+          onChange={(value, e) => socketRef.current.emit(e.action, e)}
+          setOptions={{useWorker: false}} />
+        </Grid.Column>
+        <Grid.Column>
+          hoge
+        </Grid.Column>
+      </Grid>
+      
+    </>
+  )
 }
 
 export default Page
