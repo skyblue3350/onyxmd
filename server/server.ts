@@ -43,20 +43,29 @@ app.prepare().then(async () => {
   // WebSocket
   const ioserver = new io.Server(server, {
   })
-  let data = 'hoge\nfuga'
+  let data = new Proxy({}, {
+    get: (target, name) => {
+      return target.hasOwnProperty(name) ? target[name] : ''
+    }
+  })
   ioserver.on('connection', (socket: SessionSocket) => {
-    console.log('connect', socket.request.session)
-    socket.emit('doc', data)
+    // console.log('connect', socket.request.session)
+    let noteId = null
 
+    socket.on('join', async (id) => {
+      noteId = id
+      await socket.join(noteId)
+      socket.to(noteId).emit('doc', data[noteId])
+    })
     socket.on('insert', (delta) => {
-      const doc = applyDelta(data, delta)
-      socket.broadcast.emit('insert', delta)
-      data = doc
+      const doc = applyDelta(data[noteId], delta)
+      socket.to(noteId).emit('insert', delta)
+      data[noteId] = doc
     })
     socket.on('remove', (delta) => {
-      const doc = applyDelta(data, delta)
-      socket.broadcast.emit('doc', doc)
-      data = doc
+      const doc = applyDelta(data[noteId], delta)
+      socket.to(noteId).emit('doc', doc)
+      data[noteId] = doc
     })
   })
 

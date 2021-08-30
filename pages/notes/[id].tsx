@@ -14,9 +14,12 @@ const Page = () => {
 
   useEffect(() => {
     if (router.isReady) {
+      const noteId = router.query.id
       socketRef.current = SocketIOClient.connect()
       
       const socket = socketRef.current
+
+      socket.emit('join', noteId)
       socket.on('doc', (markdown) => {
         setMarkdown(markdown)
       })
