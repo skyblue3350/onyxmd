@@ -1,4 +1,3 @@
-import { signIn, signOut, useSession } from 'next-auth/client'
 import { Button } from 'semantic-ui-react'
 import socket from 'socket.io-client'
 
