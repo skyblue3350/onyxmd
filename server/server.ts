@@ -55,16 +55,16 @@ app.prepare().then(async () => {
     socket.on('join', async (id) => {
       noteId = id
       await socket.join(noteId)
-      socket.to(noteId).emit('doc', data[noteId])
+      socket.emit('doc', data[noteId])
     })
     socket.on('insert', (delta) => {
       const doc = applyDelta(data[noteId], delta)
-      socket.to(noteId).emit('insert', delta)
+      ioserver.in(noteId).emit('insert', delta)
       data[noteId] = doc
     })
     socket.on('remove', (delta) => {
       const doc = applyDelta(data[noteId], delta)
-      socket.to(noteId).emit('doc', doc)
+      ioserver.in(noteId).emit('remove', delta)
       data[noteId] = doc
     })
   })

@@ -23,21 +23,21 @@ const Page = () => {
       const socket = socketRef.current
 
       socket.emit('join', noteId)
-      socket.on('doc', (markdown) => {
-        setMarkdown(markdown)
+      socket.on('doc', (md) => {
+        setMarkdown(md)
       })
       socket.on('insert', (delta) => {
-        setMarkdown(applyDelta(markdown, delta))
+        setMarkdown((prevMarkdown) => applyDelta(prevMarkdown, delta))
       })
       socket.on('remove', (delta) => {
-        setMarkdown(applyDelta(markdown, delta))
+        setMarkdown((prevMarkdown) => applyDelta(prevMarkdown, delta))
       })
     }
 
     return () => {
       socketRef.current && socketRef.current.disconnect()
     }
-  })
+  }, [router, ])
 
   return (
     <>
