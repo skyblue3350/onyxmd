@@ -18,7 +18,7 @@ const Page = () => {
   useEffect(() => {
     if (router.isReady) {
       const noteId = router.query.id
-      socketRef.current = SocketIOClient.connect()
+      socketRef.current = SocketIOClient()
       
       const socket = socketRef.current
 
