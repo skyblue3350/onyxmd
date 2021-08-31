@@ -14,7 +14,7 @@ passport.deserializeUser(function(user, done) {
   done(null, user)
 })
 
-const isGitHubEnabled = process.env.ONYXMD_ENABLED
+const isGitHubEnabled = (process.env.ONYXMD_GITHUB_ENABLED || '').toLocaleLowerCase() === 'true'
 
 if (isGitHubEnabled) router.use(GitHubRouter)
 

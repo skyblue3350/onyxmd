@@ -8,8 +8,8 @@ config()
 export const router = express.Router()
 
 passport.use(new Strategy({
-    clientID: process.env.ONYXMD_GITHUB_ID,
-    clientSecret: process.env.ONYXMD_GITHUB_SECRET,
+    clientID: process.env.ONYXMD_GITHUB_ID || 'dummy',
+    clientSecret: process.env.ONYXMD_GITHUB_SECRET || 'dummy',
     callbackURL: 'http://localhost:3000/github/auth',
   }, (accessToken, refreshToken, profile, done) => {
     process.nextTick(() => {
