@@ -10,6 +10,8 @@ import { router as authRouter } from './auth-router'
 import { parse } from 'url'
 import { SessionSocket } from '../@types/socket'
 import { applyDelta } from '../lib/applyDelta'
+import { Notes } from '../@types/note'
+import { Delta } from '../@types/ace'
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -43,29 +45,55 @@ app.prepare().then(async () => {
   // WebSocket
   const ioserver = new io.Server(server, {
   })
-  let data = new Proxy({}, {
+  const data: Notes = new Proxy({}, {
     get: (target, name) => {
-      return target.hasOwnProperty(name) ? target[name] : ''
+      return target.hasOwnProperty(name) ? target[name] : {
+        rivision: 0,
+        data: '',
+      }
     }
   })
+
   ioserver.on('connection', (socket: SessionSocket) => {
     // console.log('connect', socket.request.session)
     let noteId = null
 
     socket.on('join', async (id) => {
       noteId = id
+
+      const d = data[noteId]
       await socket.join(noteId)
-      socket.emit('doc', data[noteId])
+      socket.emit('doc', d.rivision, d.data)
     })
-    socket.on('insert', (delta) => {
-      const doc = applyDelta(data[noteId], delta)
-      ioserver.in(noteId).emit('insert', delta)
-      data[noteId] = doc
+    socket.on('insert', (rivision: number, delta: Delta) => {
+      const d = data[noteId]
+
+      if (d.rivision !== rivision) {
+        socket.emit('doc', d.rivision, d.data)
+      }
+
+      const doc = applyDelta(d.data, delta)
+      d.rivision += 1
+      d.data = doc
+      data[noteId] = d
+
+      // send other clients
+      socket.broadcast.to(noteId).emit(delta.action, d.rivision, delta)
     })
-    socket.on('remove', (delta) => {
-      const doc = applyDelta(data[noteId], delta)
-      ioserver.in(noteId).emit('remove', delta)
-      data[noteId] = doc
+    socket.on('remove', (rivision: number, delta: Delta) => {
+      const d = data[noteId]
+
+      if (d.rivision !== rivision) {
+        socket.emit('doc', d.rivision, d.data)
+      }
+
+      const doc = applyDelta(d.data, delta)
+      d.rivision += 1
+      d.data = doc
+      data[noteId] = d
+
+      // send other clients
+      socket.broadcast.to(noteId).emit(delta.action, d.rivision, delta)
     })
   })
 

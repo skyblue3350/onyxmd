@@ -13,6 +13,7 @@ import Markdown from '../../components/markdown'
 const Page = () => {
   const router = useRouter()
   const [markdown, setMarkdown] = useState('')
+  const [rivision, setRivision] = useState(0)
   const socketRef = useRef(null)
 
   useEffect(() => {
@@ -23,13 +24,16 @@ const Page = () => {
       const socket = socketRef.current
 
       socket.emit('join', noteId)
-      socket.on('doc', (md) => {
+      socket.on('doc', (r, md) => {
+        setRivision(r)
         setMarkdown(md)
       })
-      socket.on('insert', (delta) => {
+      socket.on('insert', (r, delta) => {
+        setRivision(r)
         setMarkdown((prevMarkdown) => applyDelta(prevMarkdown, delta))
       })
-      socket.on('remove', (delta) => {
+      socket.on('remove', (r, delta) => {
+        setRivision(r)
         setMarkdown((prevMarkdown) => applyDelta(prevMarkdown, delta))
       })
     }
@@ -47,7 +51,11 @@ const Page = () => {
         <AceEdit
           style={{width: '100%', height: '100vw'}}
           value={markdown}
-          onChange={(value, e) => socketRef.current.emit(e.action, e)}
+          onChange={(value, e) => {
+            socketRef.current.emit(e.action, rivision, e)
+            setMarkdown(value)
+            setRivision((prevRivision) => prevRivision+1)
+          }}
           setOptions={{useWorker: false}} />
         </Grid.Column>
         <Grid.Column>
