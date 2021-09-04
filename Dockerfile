@@ -2,9 +2,13 @@ FROM node:14-slim AS builder
 
 WORKDIR /app
 
-COPY . .
+COPY package.json .
+COPY package-lock.json .
 
 RUN npm install
+
+COPY . .
+
 RUN npm run build
 RUN npx tsc --project tsconfig.server.json
 
