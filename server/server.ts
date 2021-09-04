@@ -48,7 +48,7 @@ app.prepare().then(async () => {
   const data: Notes = new Proxy({}, {
     get: (target, name) => {
       return target.hasOwnProperty(name) ? target[name] : {
-        rivision: 0,
+        revision: 0,
         data: '',
       }
     }
@@ -63,37 +63,37 @@ app.prepare().then(async () => {
 
       const d = data[noteId]
       await socket.join(noteId)
-      socket.emit('doc', d.rivision, d.data)
+      socket.emit('doc', d.revision, d.data)
     })
-    socket.on('insert', (rivision: number, delta: Delta) => {
+    socket.on('insert', (revision: number, delta: Delta) => {
       const d = data[noteId]
 
-      if (d.rivision !== rivision) {
-        socket.emit('doc', d.rivision, d.data)
+      if (d.revision !== revision) {
+        socket.emit('doc', d.revision, d.data)
       }
 
       const doc = applyDelta(d.data, delta)
-      d.rivision += 1
+      d.revision += 1
       d.data = doc
       data[noteId] = d
 
       // send other clients
-      socket.broadcast.to(noteId).emit(delta.action, d.rivision, delta)
+      socket.broadcast.to(noteId).emit(delta.action, d.revision, delta)
     })
-    socket.on('remove', (rivision: number, delta: Delta) => {
+    socket.on('remove', (revision: number, delta: Delta) => {
       const d = data[noteId]
 
-      if (d.rivision !== rivision) {
-        socket.emit('doc', d.rivision, d.data)
+      if (d.revision !== revision) {
+        socket.emit('doc', d.revision, d.data)
       }
 
       const doc = applyDelta(d.data, delta)
-      d.rivision += 1
+      d.revision += 1
       d.data = doc
       data[noteId] = d
 
       // send other clients
-      socket.broadcast.to(noteId).emit(delta.action, d.rivision, delta)
+      socket.broadcast.to(noteId).emit(delta.action, d.revision, delta)
     })
   })
 

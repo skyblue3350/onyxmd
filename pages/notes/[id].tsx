@@ -13,7 +13,7 @@ import Markdown from '../../components/markdown'
 const Page = () => {
   const router = useRouter()
   const [markdown, setMarkdown] = useState('')
-  const [rivision, setRivision] = useState(0)
+  const [revision, setRevision] = useState(0)
   const socketRef = useRef(null)
 
   useEffect(() => {
@@ -25,15 +25,15 @@ const Page = () => {
 
       socket.emit('join', noteId)
       socket.on('doc', (r, md) => {
-        setRivision(r)
+        setRevision(r)
         setMarkdown(md)
       })
       socket.on('insert', (r, delta) => {
-        setRivision(r)
+        setRevision(r)
         setMarkdown((prevMarkdown) => applyDelta(prevMarkdown, delta))
       })
       socket.on('remove', (r, delta) => {
-        setRivision(r)
+        setRevision(r)
         setMarkdown((prevMarkdown) => applyDelta(prevMarkdown, delta))
       })
     }
@@ -52,9 +52,9 @@ const Page = () => {
           style={{width: '100%', height: '100vw'}}
           value={markdown}
           onChange={(value, e) => {
-            socketRef.current.emit(e.action, rivision, e)
+            socketRef.current.emit(e.action, revision, e)
             setMarkdown(value)
-            setRivision((prevRivision) => prevRivision+1)
+            setRevision((prevrevision) => prevrevision+1)
           }}
           setOptions={{useWorker: false}} />
         </Grid.Column>

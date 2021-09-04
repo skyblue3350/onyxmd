@@ -4,6 +4,6 @@ export interface Notes {
 }
 
 export interface Note {
-    rivision: number
+    revision: number
     data: string
 }
