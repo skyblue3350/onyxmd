@@ -16,10 +16,12 @@ export default function CodeEditor(props: IAceEditorProps) {
         mode="markdown"
         theme="terminal"
         fontSize="14"
+        style={{width: '100%'}}
         setOptions={{
-          tabSize:2,
-          useWorker:false,
+          tabSize: 2,
+          useWorker: false,
         }}
+        showPrintMargin={false}
         commands={[
             {
                 name: 'Indent',
