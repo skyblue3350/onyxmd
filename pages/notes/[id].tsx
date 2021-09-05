@@ -7,7 +7,7 @@ const AceEdit = dynamic(()=>import('../../components/AceEdit'), {ssr:false})
 
 import { applyDelta } from '../../lib/applyDelta'
 import Nav from '../../components/nav'
-import { Grid } from 'semantic-ui-react'
+import { Container, Grid } from 'semantic-ui-react'
 import Markdown from '../../components/markdown'
 
 const Page = () => {
@@ -59,21 +59,21 @@ const Page = () => {
         onClickView={() => changeMode('view')} />
       <Grid columns={mode === 'both'? 2 : 1}>
         {mode === 'edit' || mode === 'both' ?
-        <Grid.Column>
+        <Grid.Column className='noPadding'>
           <AceEdit
-            style={{width: '100%', height: '100vw'}}
             value={markdown}
             onChange={(value, e) => {
               socketRef.current.emit(e.action, revision, e)
               setMarkdown(value)
               setRevision((prevrevision) => prevrevision+1)
-            }}
-            setOptions={{useWorker: false}} />
+            }} />
         </Grid.Column>
         : null}
         {mode === 'view' || mode === 'both' ?
         <Grid.Column>
-          <Markdown markdown={markdown}/>
+          <Container>
+            <Markdown markdown={markdown}/>
+          </Container>
         </Grid.Column>
         : null}
       </Grid>

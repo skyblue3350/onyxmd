@@ -14,3 +14,12 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.hljs {
+  padding: 10px;
+}
+
+.noPadding {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
