@@ -3,6 +3,7 @@ import MarkdownIt from 'markdown-it'
 import MarkdownItAnchor from 'markdown-it-anchor'
 import MarkdownItTableOfContents from 'markdown-it-table-of-contents'
 import hljs from 'highlight.js'
+import emoji from 'markdown-it-emoji'
 
 interface Props {
     markdown: string
@@ -25,6 +26,7 @@ const Markdown = (props: Props) => {
     })
     md.use(MarkdownItAnchor)
     md.use(MarkdownItTableOfContents)
+    md.use(emoji)
     return <div dangerouslySetInnerHTML={{__html : md.render(props.markdown)}} />
 }
 
