@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useReducer, useRef, useState } from 'react'
 import SocketIOClient from 'socket.io-client'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
@@ -12,11 +12,20 @@ import Markdown from '../../components/markdown'
 
 const Page = () => {
   const router = useRouter()
-  const [markdown, setMarkdown] = useState('')
-  const [revision, setRevision] = useState(0)
   const [noteId, setNoteId] = useState('')
   const [mode, setMode] = useState('edit')
   const socketRef = useRef(null)
+  const editorRef = useRef(null)
+
+  const mdReducer = (state, action) => {
+    if (action.type === 'doc') {
+      return {revision: action.r, markdown: action.md}
+    } else if (action.type === 'apply') {
+      return {revision: action.r, markdown: applyDelta(state.markdown, action.delta)}
+    }
+  }
+
+  const [{ markdown, revision }, dispatch] = useReducer(mdReducer, {markdown: '', revision: 0})
 
   useEffect(() => {
     if (router.isReady) {
@@ -27,18 +36,9 @@ const Page = () => {
       const socket = socketRef.current
 
       socket.emit('join', router.query.id)
-      socket.on('doc', (r, md) => {
-        setRevision(r)
-        setMarkdown(md)
-      })
-      socket.on('insert', (r, delta) => {
-        setRevision(r)
-        setMarkdown((prevMarkdown) => applyDelta(prevMarkdown, delta))
-      })
-      socket.on('remove', (r, delta) => {
-        setRevision(r)
-        setMarkdown((prevMarkdown) => applyDelta(prevMarkdown, delta))
-      })
+      socket.on('doc', (r, md) => dispatch({type: 'doc', r, md}))
+      socket.on('insert', (r, delta) => dispatch({type: 'apply', r, delta}))
+      socket.on('remove', (r, delta) => dispatch({type: 'apply', r, delta}))
     }
 
     return () => {
@@ -62,10 +62,10 @@ const Page = () => {
         <Grid.Column className='noPadding'>
           <AceEdit
             value={markdown}
+            onLoad={(editor) => editorRef.current = editor}
             onChange={(value, e) => {
               socketRef.current.emit(e.action, revision, e)
-              setMarkdown(value)
-              setRevision((prevrevision) => prevrevision+1)
+              dispatch({type: 'doc', r: revision+1, md: value})
             }} />
         </Grid.Column>
         : null}
