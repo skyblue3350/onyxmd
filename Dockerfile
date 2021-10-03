@@ -30,4 +30,4 @@ COPY --from=builder /app/package.json ./package.json
 
 USER nextjs
 
-CMD ["node", "dist/server/server.js"]
+CMD ["node", "dist/server.js"]
