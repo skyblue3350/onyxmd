@@ -14,7 +14,7 @@ export default function Page() {
   const [markdown, setMarkdown] = useState('')
 
   useEffect(() => {
-    if (router.isReady) {
+    if (router.isReady && router.query.mode) {
       setMode(router.query.mode.toString())
     }
   }, [router])
