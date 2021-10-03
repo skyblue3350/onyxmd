@@ -29,7 +29,7 @@ const CodeMirror = (props: Props) => {
   useEffect(() => {
     if (EditorRef !== null) {
       const ydoc = new Y.Doc()
-      const wsProvider = new WebsocketProvider('ws://localhost:3000', props.room, ydoc)
+      const wsProvider = new WebsocketProvider(`ws://${location.host}`, props.room, ydoc)
       const yText = ydoc.getText('codemirror')
       const yUndoManager = new Y.UndoManager(yText)
       const awareness = wsProvider.awareness
