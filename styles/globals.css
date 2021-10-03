@@ -4,6 +4,7 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  overflow: hidden;
 }
 
 a {
@@ -22,4 +23,42 @@ a {
 .noPadding {
   padding-right: 0 !important;
   padding-left: 0 !important;
+}
+
+.remote-caret {
+  position: absolute;
+  border-left: black;
+  border-left-style: solid;
+  border-left-width: 2px;
+  height: 1em;
+}
+.remote-caret > div {
+  position: relative;
+  top: -1.05em;
+  font-size: 13px;
+  background-color: rgb(250, 129, 0);
+  font-family: serif;
+  font-style: normal;
+  font-weight: normal;
+  line-height: normal;
+  user-select: none;
+  color: white;
+  padding-left: 2px;
+  padding-right: 2px;
+  z-index: 3;
+}
+
+.CodeMirror-css {
+  height: calc(100% - 50px) !important;
+  width: 100%;
+}
+
+.CodeMirror {
+  height: 100% !important;
+}
+
+.editor-menu {
+  height: 50px !important;
+  margin: 0 !important;
+  padding: 0;
 }
