@@ -41,7 +41,7 @@ export default function Page() {
   const changeMode = (mode: 'edit' | 'both' | 'view') => {
     const url = new URL(location.href)
     url.searchParams.set('mode', mode)
-    history.replaceState({}, '', url)
+    history.replaceState({}, '', url.toString())
     setMode(mode)
   }
 
@@ -57,7 +57,7 @@ export default function Page() {
         </div>
       :null}
       {mode === 'view' || mode === 'both' ?
-        <div style={{width: mode === 'both'? '50%' : '100%', padding: 10}}>
+        <div style={{width: mode === 'both'? '50%' : '100%', padding: 10, overflowY: 'auto'}}>
           <Markdown markdown={markdown} />
         </div>
       :null}
