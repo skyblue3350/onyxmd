@@ -9,11 +9,16 @@ import 'codemirror/keymap/sublime'
 import 'codemirror/keymap/emacs'
 import { Menu, Dropdown, Input } from 'semantic-ui-react'
 
+interface Awareness {
+  [key:string]: any
+}
+
 interface Props {
   room: string
   color: string
   username: string
   onChange?: (value: string) => void
+  onUserChange?: (users: Map<number, Awareness>) => void
 }
 
 const CodeMirror = (props: Props) => {
@@ -36,10 +41,15 @@ const CodeMirror = (props: Props) => {
       awareness.setLocalStateField('user', {
         name: props.username,
         color: props.color,
+        icon: undefined,
       })
   
       const getBinding = new CodemirrorBinding(yText, EditorRef, awareness, {
         yUndoManager,
+      })
+
+      awareness.on('change', () => {
+        props.onUserChange && props.onUserChange(awareness.getStates())
       })
 
       return () => {

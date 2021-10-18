@@ -12,6 +12,7 @@ export default function Page() {
   const router = useRouter()
   const [mode, setMode] = useState('edit')
   const [markdown, setMarkdown] = useState('')
+  const [userList, setUserList] = useState([])
 
   useEffect(() => {
     if (router.isReady && router.query.mode) {
@@ -28,7 +29,8 @@ export default function Page() {
       username={`user${('000'+Math.floor(Math.random() * 1000)).slice(-3)}`}
       color={randomColor()}
       room={router.query.id.toString()}
-      onChange={(value) => setMarkdown(value)}/>
+      onChange={(value) => setMarkdown(value)}
+      onUserChange={(users) => setUserList(Array.from(users.values()).map(item => item.user))} />
   }, [router])
 
   if (!router.isReady) {
@@ -47,6 +49,7 @@ export default function Page() {
 
   return <div style={{height: '100vh'}}>
       <Nav mode={mode}
+        userList={userList}
         onClickEdit={() => changeMode('edit')}
         onClickBoth={() => changeMode('both')}
         onClickView={() => changeMode('view')} />

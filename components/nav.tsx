@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import React from 'react'
-import { Icon, Label, Menu } from 'semantic-ui-react'
+import { Icon, Label, List, Menu, Popup, Image } from 'semantic-ui-react'
 
 interface Props {
     onClickEdit: () => void
     onClickBoth: () => void
     onClickView: () => void
     mode: string
+    userList: {name: string, color: string, icon: string}[]
 }
 
 const Nav = (props: Props) => {
@@ -29,10 +30,18 @@ const Nav = (props: Props) => {
                 </Menu>
             </Menu.Item>
             <Menu.Item position='right'>
-                <Label color='blue' size='large'>
-                    <Icon name='users' />
-                    1 Online
-                </Label>
+                <Popup
+                    trigger={<Label color='blue' size='large'><Icon name='users' />{props.userList.length} Online</Label>}
+                    position='bottom center'>
+                    <List>
+                        {props.userList.map((user, index) => {
+                            return <List.Item key={index}>
+                                {user.icon ? <Image avatar alt='icon' src={user.icon} style={{height: 18, width: 18}} /> : <Icon name='user' />}
+                                <List.Content>{user.name}</List.Content>
+                            </List.Item>
+                        })}
+                    </List>
+                </Popup>
             </Menu.Item>
         </Menu>
     )
