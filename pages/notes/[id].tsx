@@ -13,6 +13,7 @@ export default function Page() {
   const [mode, setMode] = useState('edit')
   const [markdown, setMarkdown] = useState('')
   const [userList, setUserList] = useState([])
+  const [state, setState] = useState('connecting')
 
   useEffect(() => {
     if (router.isReady && router.query.mode) {
@@ -30,7 +31,8 @@ export default function Page() {
       color={randomColor()}
       room={router.query.id.toString()}
       onChange={(value) => setMarkdown(value)}
-      onUserChange={(users) => setUserList(Array.from(users.values()).map(item => item.user))} />
+      onUserChange={(users) => setUserList(Array.from(users.values()).map(item => item.user))}
+      onStatusChange={(state) => setState(state)} />
   }, [router])
 
   if (!router.isReady) {
@@ -49,6 +51,7 @@ export default function Page() {
 
   return <div style={{height: '100vh'}}>
       <Nav mode={mode}
+        state={state}
         userList={userList}
         onClickEdit={() => changeMode('edit')}
         onClickBoth={() => changeMode('both')}

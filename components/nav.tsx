@@ -7,6 +7,7 @@ interface Props {
     onClickBoth: () => void
     onClickView: () => void
     mode: string
+    state: string
     userList: {name: string, color: string, icon: string}[]
 }
 
@@ -31,7 +32,7 @@ const Nav = (props: Props) => {
             </Menu.Item>
             <Menu.Item position='right'>
                 <Popup
-                    trigger={<Label color='blue' size='large'><Icon name='users' />{props.userList.length} Online</Label>}
+                    trigger={<Label color={props.state == 'connected' ? 'blue' : 'yellow'} size='large'><Icon name='users' />{props.state == 'connected' ? `${props.userList.length} Online` : props.state}</Label>}
                     position='bottom center'>
                     <List>
                         {props.userList.map((user, index) => {

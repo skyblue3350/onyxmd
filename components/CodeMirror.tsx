@@ -19,6 +19,7 @@ interface Props {
   username: string
   onChange?: (value: string) => void
   onUserChange?: (users: Map<number, Awareness>) => void
+  onStatusChange?: (state: 'connecting' | 'connected' | 'disconnected') => void
 }
 
 const CodeMirror = (props: Props) => {
@@ -50,6 +51,10 @@ const CodeMirror = (props: Props) => {
 
       awareness.on('change', () => {
         props.onUserChange && props.onUserChange(awareness.getStates())
+      })
+
+      wsProvider.on('status', ({status}) => {
+        props.onStatusChange && props.onStatusChange(status)
       })
 
       return () => {
