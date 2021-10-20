@@ -8,6 +8,7 @@ import 'codemirror/keymap/vim'
 import 'codemirror/keymap/sublime'
 import 'codemirror/keymap/emacs'
 import { Menu, Dropdown, Input } from 'semantic-ui-react'
+import { useSession } from 'next-auth/client'
 
 interface Awareness {
   [key:string]: any
@@ -23,6 +24,7 @@ interface Props {
 }
 
 const CodeMirror = (props: Props) => {
+  const [ session, loading ] = useSession()
   const keyMaps = ['sublime', 'vim', 'emacs']
   const themes = ['material', 'idea', 'monokai']
 
@@ -40,9 +42,9 @@ const CodeMirror = (props: Props) => {
       const yUndoManager = new Y.UndoManager(yText)
       const awareness = wsProvider.awareness
       awareness.setLocalStateField('user', {
-        name: props.username,
+        name: session ? session.user.name : props.username,
         color: props.color,
-        icon: undefined,
+        icon: session ? session.user.image : undefined,
       })
   
       const getBinding = new CodemirrorBinding(yText, EditorRef, awareness, {

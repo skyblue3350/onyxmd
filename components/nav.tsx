@@ -1,3 +1,4 @@
+import { signIn, useSession } from 'next-auth/client'
 import Link from 'next/link'
 import React from 'react'
 import { Icon, Label, List, Menu, Popup, Image } from 'semantic-ui-react'
@@ -12,6 +13,12 @@ interface Props {
 }
 
 const Nav = (props: Props) => {
+    const [ session, loading ] = useSession()
+
+    if (loading) {
+        return <>loading</>
+    }
+
     return (
         <Menu inverted icon style={{margin: 0}}>
             <Menu.Item position='left'>
@@ -31,6 +38,8 @@ const Nav = (props: Props) => {
                 </Menu>
             </Menu.Item>
             <Menu.Item position='right'>
+                {session && session.user.name}
+                {!session && <Label content='login' onClick={() => signIn()} as='a' />}
                 <Popup
                     trigger={<Label color={props.state == 'connected' ? 'blue' : 'yellow'} size='large'><Icon name='users' />{props.state == 'connected' ? `${props.userList.length} Online` : props.state}</Label>}
                     position='bottom center'>
