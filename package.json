@@ -20,6 +20,7 @@
     "markdown-it-emoji": "^2.0.0",
     "markdown-it-table-of-contents": "^0.5.2",
     "next": "11.1.0",
+    "next-auth": "^3.29.0",
     "passport": "^0.4.1",
     "passport-github2": "^0.1.12",
     "passport-local": "^1.0.0",
