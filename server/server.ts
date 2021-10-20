@@ -38,6 +38,10 @@ app.prepare().then(() => {
     const parsedUrl = parse(req.url, true)
     handle(req, res, parsedUrl)
   })
+  app.post('/*', (req: IncomingMessage, res: ServerResponse) => {
+    const parsedUrl = parse(req.url, true)
+    handle(req, res, parsedUrl)
+  })
 
   // WebSocket
   const wss = new WebSocket.Server({server})
