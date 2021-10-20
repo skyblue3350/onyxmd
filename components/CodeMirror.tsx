@@ -66,7 +66,7 @@ const CodeMirror = (props: Props) => {
         }
       }
     }
-  }, [EditorRef, props])
+  }, [EditorRef, props, session])
 
 return <>
       <CodeMirrorEditor
