@@ -35,7 +35,7 @@ const CodeMirror = (props: Props) => {
   const [tabSize, setTabSize] = useState(2)
 
   useEffect(() => {
-    if (EditorRef !== null) {
+    if (EditorRef !== null && !loading) {
       const ydoc = new Y.Doc()
       const wsProvider = new WebsocketProvider(`ws://${location.host}`, props.room, ydoc)
       const yText = ydoc.getText('codemirror')
@@ -66,7 +66,7 @@ const CodeMirror = (props: Props) => {
         }
       }
     }
-  }, [EditorRef, props, session])
+  }, [EditorRef, props, session, loading])
 
 return <>
       <CodeMirrorEditor
