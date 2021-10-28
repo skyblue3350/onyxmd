@@ -33,7 +33,7 @@ const Markdown = (props: Props) => {
         return twemoji.parse(token[idx].content)
     }
 
-    return <div dangerouslySetInnerHTML={{__html : md.render(props.markdown)}} />
+    return <div dangerouslySetInnerHTML={{__html : md.render(props.markdown)}} className='markdown-body' style={{padding: 10, width: '100%', minHeight: '100%'}} />
 }
 
 export default Markdown

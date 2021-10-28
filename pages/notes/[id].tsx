@@ -60,7 +60,7 @@ export default function Page() {
         <div style={{width: mode === 'both'? '50%' : '100%', display: mode !== 'view' ? 'block' : 'none'}}>
           {code}
         </div>
-        <div style={{width: mode === 'both'? '50%' : '100%', display: mode !== 'edit' ? 'block' : 'none', padding: mode !== 'edit' ? 10 : 0, overflowY: 'auto'}}>
+        <div style={{width: mode === 'both'? '50%' : '100%', display: mode !== 'edit' ? 'block' : 'none', overflowY: 'auto'}}>
           <Markdown markdown={markdown} />
         </div>
       </div>

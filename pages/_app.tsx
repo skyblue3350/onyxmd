@@ -7,6 +7,7 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/material.css'
 import 'codemirror/theme/idea.css'
 import 'codemirror/theme/monokai.css'
+import 'github-markdown-css/github-markdown-dark.css'
 
 function MyApp({Component, pageProps}) {
   return <Provider session={pageProps.session}><Component {...pageProps} /></Provider>
