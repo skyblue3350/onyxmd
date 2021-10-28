@@ -30,9 +30,15 @@ const CodeMirror = (props: Props) => {
 
   const [EditorRef, setEditorRef] = useState(null)
   const [code, setCode] = useState('')
-  const [keyMap, setKeyMap] = useState(keyMaps[0])
-  const [theme, setTheme] = useState(themes[0])
-  const [tabSize, setTabSize] = useState(2)
+  const [keyMap, setKeyMap] = useState(localStorage.getItem('keymap') || keyMaps[0])
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || themes[0])
+  const [tabSize, setTabSize] = useState(parseInt(localStorage.getItem('tabSize') || '2'))
+
+  useEffect(() => {
+    localStorage.setItem('keymap', keyMap)
+    localStorage.setItem('theme', theme)
+    localStorage.setItem('tabSize', tabSize.toString())
+  }, [keyMap, theme, tabSize])
 
   useEffect(() => {
     if (EditorRef !== null && !loading) {
