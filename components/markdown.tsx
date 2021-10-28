@@ -8,6 +8,7 @@ import twemoji from 'twemoji'
 
 interface Props {
     markdown: string
+    style: any
 }
 
 const Markdown = (props: Props) => {
@@ -33,7 +34,7 @@ const Markdown = (props: Props) => {
         return twemoji.parse(token[idx].content)
     }
 
-    return <div dangerouslySetInnerHTML={{__html : md.render(props.markdown)}} className='markdown-body' style={{padding: 10, width: '100%', minHeight: '100%'}} />
+    return <div dangerouslySetInnerHTML={{__html : md.render(props.markdown)}} className='markdown-body' {...props}/>
 }
 
 export default Markdown

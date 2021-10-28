@@ -6,6 +6,7 @@ import { Dimmer, Loader } from 'semantic-ui-react'
 
 import Nav from '../../components/nav'
 import Markdown from '../../components/markdown'
+import MDViewer from '../../components/MDViewer'
 const CodeMirror = dynamic(async ()=> await import('../../components/CodeMirror'), {ssr: false})
 
 export default function Page() {
@@ -61,7 +62,7 @@ export default function Page() {
           {code}
         </div>
         <div style={{width: mode === 'both'? '50%' : '100%', display: mode !== 'edit' ? 'block' : 'none', overflowY: 'auto'}}>
-          <Markdown markdown={markdown} />
+          <MDViewer markdown={markdown} />
         </div>
       </div>
     </div>
