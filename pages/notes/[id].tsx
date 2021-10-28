@@ -57,16 +57,12 @@ export default function Page() {
         onClickBoth={() => changeMode('both')}
         onClickView={() => changeMode('view')} />
       <div style={{height: 'calc(100% - 50px)', display: 'flex'}}>
-      {mode === 'edit' || mode === 'both' ?
-        <div style={{width: mode === 'both'? '50%' : '100%'}}>
+        <div style={{width: mode === 'both'? '50%' : mode === 'edit' ? '100%' : '0%'}}>
           {code}
         </div>
-      :null}
-      {mode === 'view' || mode === 'both' ?
-        <div style={{width: mode === 'both'? '50%' : '100%', padding: 10, overflowY: 'auto'}}>
+        <div style={{width: mode === 'both'? '50%' : mode === 'view' ? '100%' : '0%', padding: mode !== 'edit' ? 10 : 0, overflowY: 'auto'}}>
           <Markdown markdown={markdown} />
         </div>
-      :null}
       </div>
     </div>
 }
