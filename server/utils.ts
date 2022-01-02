@@ -71,19 +71,6 @@ const messageSync = 0
 const messageAwareness = 1
 // const messageAuth = 2
 
-/**
- * @param {Uint8Array} update
- * @param {any} origin
- * @param {WSSharedDoc} doc
- */
-const updateHandler = (update, origin, doc) => {
-  const encoder = encoding.createEncoder()
-  encoding.writeVarUint(encoder, messageSync)
-  syncProtocol.writeUpdate(encoder, update)
-  const message = encoding.toUint8Array(encoder)
-  doc.conns.forEach((_, conn) => send(doc, conn, message))
-}
-
 class WSSharedDoc extends Y.Doc {
   /**
    * @param {string} name
@@ -129,7 +116,6 @@ class WSSharedDoc extends Y.Doc {
       })
     }
     this.awareness.on('update', awarenessChangeHandler)
-    this.on('update', updateHandler)
     if (isCallbackSet) {
       this.on('update', debounce(
         callbackHandler,
@@ -231,9 +217,13 @@ const pingTimeout = 30000
  * @param {any} opts
  */
 export const setupWSConnection = (conn, req, { docName = req.url.slice(1).split('?')[0], gc = true } = {}) => {
+  console.log(docName, req.url)
   conn.binaryType = 'arraybuffer'
   // get doc, initialize if it does not exist yet
   const doc = getYDoc(docName, gc)
+
+  console.log(doc)
+
   doc.conns.set(conn, new Set())
   // listen and reply to events
   conn.on('message', /** @param {ArrayBuffer} message */ message => messageListener(conn, doc, new Uint8Array(message)))
