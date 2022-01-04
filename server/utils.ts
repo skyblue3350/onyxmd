@@ -4,8 +4,6 @@ const awarenessProtocol = require('y-protocols/dist/awareness.cjs')
 
 const encoding = require('lib0/dist/encoding.cjs')
 const decoding = require('lib0/dist/decoding.cjs')
-const mutex = require('lib0/dist/mutex.cjs')
-const map = require('lib0/dist/map.cjs')
 
 const debounce = require('lodash.debounce')
 
@@ -21,68 +19,23 @@ const wsReadyStateClosed = 3 // eslint-disable-line
 
 // disable gc when using snapshots!
 const gcEnabled = process.env.GC !== 'false' && process.env.GC !== '0'
-const persistenceDir = process.env.YPERSISTENCE
-/**
- * @type {{bindState: function(string,WSSharedDoc):void, writeState:function(string,WSSharedDoc):Promise<any>, provider: any}|null}
- */
-let persistence = null
-if (typeof persistenceDir === 'string') {
-  console.info('Persisting documents to "' + persistenceDir + '"')
-  // @ts-ignore
-  const LeveldbPersistence = require('y-leveldb').LeveldbPersistence
-  const ldb = new LeveldbPersistence(persistenceDir)
-  persistence = {
-    provider: ldb,
-    bindState: async (docName, ydoc) => {
-      const persistedYdoc = await ldb.getYDoc(docName)
-      const newUpdates = Y.encodeStateAsUpdate(ydoc)
-      ldb.storeUpdate(docName, newUpdates)
-      Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc))
-      ydoc.on('update', update => {
-        ldb.storeUpdate(docName, update)
-      })
-    },
-    writeState: async (docName, ydoc) => {}
-  }
-}
-
-/**
- * @param {{bindState: function(string,WSSharedDoc):void,
- * writeState:function(string,WSSharedDoc):Promise<any>,provider:any}|null} persistence_
- */
-exports.setPersistence = persistence_ => {
-  persistence = persistence_
-}
 
 /**
  * @return {null|{bindState: function(string,WSSharedDoc):void,
   * writeState:function(string,WSSharedDoc):Promise<any>}|null} used persistence layer
   */
-exports.getPersistence = () => persistence
-
-/**
- * @type {Map<string,WSSharedDoc>}
- */
-const docs = new Map()
-// exporting docs so that others can use it
-exports.docs = docs
 
 const messageSync = 0
 const messageAwareness = 1
 // const messageAuth = 2
 
 class WSSharedDoc extends Y.Doc {
-  /**
-   * @param {string} name
-   */
   name: string
-  mux
   conns
   awareness
-  constructor (name) {
+  constructor (name:string) {
     super({ gc: gcEnabled })
     this.name = name
-    this.mux = mutex.createMutex()
     /**
      * Maps from conn to set of controlled user ids. Delete all user ids from awareness when this conn is closed
      * @type {Map<Object, Set<number>>}
@@ -126,22 +79,19 @@ class WSSharedDoc extends Y.Doc {
   }
 }
 
-/**
- * Gets a Y.Doc by name, whether in memory or on disk
- *
- * @param {string} docname - the name of the Y.Doc to find or create
- * @param {boolean} gc - whether to allow gc on the doc (applies only when created)
- * @return {WSSharedDoc}
- */
-const getYDoc = (docname, gc = true) => map.setIfUndefined(docs, docname, () => {
-  const doc = new WSSharedDoc(docname)
-  doc.gc = gc
-  if (persistence !== null) {
-    persistence.bindState(docname, doc)
+const docs : Map<string,WSSharedDoc> = new Map()
+
+const getYDoc = (docname: string, gc: boolean = true) => {
+  let doc = docs.get(docname)
+  if (doc !== undefined) {
+    return doc
+  } else {
+    doc = new WSSharedDoc(docname)
+    doc.gc = gc
+    docs.set(docname, doc)
+    return doc
   }
-  docs.set(docname, doc)
-  return doc
-})
+}
 
 exports.getYDoc = getYDoc
 
@@ -154,7 +104,10 @@ const messageListener = (conn, doc, message) => {
   const encoder = encoding.createEncoder()
   const decoder = decoding.createDecoder(message)
   const messageType = decoding.readVarUint(decoder)
+
   switch (messageType) {
+    // type: 0
+    // 編集内容の共有
     case messageSync:
       encoding.writeVarUint(encoder, messageSync)
       syncProtocol.readSyncMessage(decoder, encoder, doc, null)
@@ -162,6 +115,8 @@ const messageListener = (conn, doc, message) => {
         send(doc, conn, encoding.toUint8Array(encoder))
       }
       break
+    // type: 1
+    // 編集状態の共有
     case messageAwareness: {
       awarenessProtocol.applyAwarenessUpdate(doc.awareness, decoding.readVarUint8Array(decoder), conn)
       break
@@ -182,13 +137,6 @@ const closeConn = (doc, conn) => {
     const controlledIds = doc.conns.get(conn)
     doc.conns.delete(conn)
     awarenessProtocol.removeAwarenessStates(doc.awareness, Array.from(controlledIds), null)
-    if (doc.conns.size === 0 && persistence !== null) {
-      // if persisted, we store state and destroy ydocument
-      persistence.writeState(doc.name, doc).then(() => {
-        doc.destroy()
-      })
-      docs.delete(doc.name)
-    }
   }
   conn.close()
 }
@@ -221,12 +169,9 @@ export const setupWSConnection = (conn, req, { docName = req.url.slice(1).split(
   conn.binaryType = 'arraybuffer'
   // get doc, initialize if it does not exist yet
   const doc = getYDoc(docName, gc)
-
-  console.log(doc)
-
   doc.conns.set(conn, new Set())
   // listen and reply to events
-  conn.on('message', /** @param {ArrayBuffer} message */ message => messageListener(conn, doc, new Uint8Array(message)))
+  conn.on('message', message => messageListener(conn, doc, new Uint8Array(message)))
 
   // Check if connection is still alive
   let pongReceived = true
