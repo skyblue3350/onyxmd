@@ -100,7 +100,7 @@ exports.getYDoc = getYDoc
  * @param {WSSharedDoc} doc
  * @param {Uint8Array} message
  */
-const messageListener = (conn, doc, message) => {
+const messageListener = (conn, doc: WSSharedDoc, message) => {
   const encoder = encoding.createEncoder()
   const decoder = decoding.createDecoder(message)
   const messageType = decoding.readVarUint(decoder)
