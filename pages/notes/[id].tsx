@@ -3,10 +3,12 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import randomColor from 'randomcolor'
 import { Dimmer, Loader } from 'semantic-ui-react'
+import { useUpdateEffect } from 'ahooks'
 
 import Nav from '../../components/nav'
-import Markdown from '../../components/markdown'
 import MDViewer from '../../components/MDViewer'
+import { db } from '../../lib/db'
+import { getMarkdown } from '../../lib/markdown'
 const CodeMirror = dynamic(async ()=> await import('../../components/CodeMirror'), {ssr: false})
 
 export default function Page() {
@@ -35,6 +37,28 @@ export default function Page() {
       onUserChange={(users) => setUserList(Array.from(users.values()).map(item => item.user))}
       onStatusChange={(state) => setState(state)} />
   }, [router])
+
+  useUpdateEffect(() => {
+    const env = getMarkdown(markdown).env
+    const path = location.pathname
+    db.noteHistories.where('path').equals(path).first().then(page => {
+      if (page) {
+        db.noteHistories.update(page.id, {
+          updated_at: new Date(),
+          title: env.title,
+          description: env.excerpt.length === 0 ? '' : env.excerpt[0]
+        })
+      } else {
+        db.noteHistories.add({
+          created_at: new Date(),
+          updated_at: new Date(),
+          title: env.title,
+          path,
+          description: env.excerpt.length === 0 ? '' : env.excerpt[0]
+        })
+      }
+    })
+  }, [markdown])
 
   if (!router.isReady) {
     return (
