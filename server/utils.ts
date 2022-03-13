@@ -1,4 +1,3 @@
-const Y = require('yjs')
 const syncProtocol = require('y-protocols/dist/sync.cjs')
 const awarenessProtocol = require('y-protocols/dist/awareness.cjs')
 
@@ -7,6 +6,8 @@ const decoding = require('lib0/dist/decoding.cjs')
 
 const debounce = require('lodash.debounce')
 
+import { Doc } from 'yjs'
+import { RedisPersistence } from 'y-redis'
 import { callbackHandler, isCallbackSet } from './callback'
 
 const CALLBACK_DEBOUNCE_WAIT = parseInt(process.env.CALLBACK_DEBOUNCE_WAIT) || 2000
@@ -14,22 +15,22 @@ const CALLBACK_DEBOUNCE_MAXWAIT = parseInt(process.env.CALLBACK_DEBOUNCE_MAXWAIT
 
 const wsReadyStateConnecting = 0
 const wsReadyStateOpen = 1
-const wsReadyStateClosing = 2 // eslint-disable-line
-const wsReadyStateClosed = 3 // eslint-disable-line
+
+const redisPersistence = new RedisPersistence({
+  redisOpts: {
+    host: 'localhost',
+    port: 6379,
+  }
+})
 
 // disable gc when using snapshots!
 const gcEnabled = process.env.GC !== 'false' && process.env.GC !== '0'
-
-/**
- * @return {null|{bindState: function(string,WSSharedDoc):void,
-  * writeState:function(string,WSSharedDoc):Promise<any>}|null} used persistence layer
-  */
 
 const messageSync = 0
 const messageAwareness = 1
 // const messageAuth = 2
 
-class WSSharedDoc extends Y.Doc {
+class WSSharedDoc extends Doc {
   name: string
   conns
   awareness
@@ -88,12 +89,11 @@ const getYDoc = (docname: string, gc: boolean = true) => {
   } else {
     doc = new WSSharedDoc(docname)
     doc.gc = gc
+    redisPersistence.bindState(docname, doc)
     docs.set(docname, doc)
     return doc
   }
 }
-
-exports.getYDoc = getYDoc
 
 /**
  * @param {any} conn
@@ -165,7 +165,6 @@ const pingTimeout = 30000
  * @param {any} opts
  */
 export const setupWSConnection = (conn, req, { docName = req.url.slice(1).split('?')[0], gc = true } = {}) => {
-  console.log(docName, req.url)
   conn.binaryType = 'arraybuffer'
   // get doc, initialize if it does not exist yet
   const doc = getYDoc(docName, gc)
