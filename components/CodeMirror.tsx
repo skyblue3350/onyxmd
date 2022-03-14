@@ -8,7 +8,7 @@ import 'codemirror/keymap/vim'
 import 'codemirror/keymap/sublime'
 import 'codemirror/keymap/emacs'
 import { Menu, Dropdown, Input } from 'semantic-ui-react'
-import { useSession } from 'next-auth/client'
+import { useSession } from 'next-auth/react'
 
 interface Awareness {
   [key:string]: any
@@ -24,7 +24,7 @@ interface Props {
 }
 
 const CodeMirror = (props: Props) => {
-  const [ session, loading ] = useSession()
+  const { data: session } = useSession()
   const keyMaps = ['sublime', 'vim', 'emacs']
   const themes = ['material', 'idea', 'monokai']
 
@@ -41,7 +41,7 @@ const CodeMirror = (props: Props) => {
   }, [keyMap, theme, tabSize])
 
   useEffect(() => {
-    if (EditorRef !== null && !loading) {
+    if (EditorRef !== null && !session) {
       const ydoc = new Y.Doc()
       const wsProvider = new WebsocketProvider(`ws://${location.host}`, props.room, ydoc)
       const yText = ydoc.getText('codemirror')
@@ -72,7 +72,7 @@ const CodeMirror = (props: Props) => {
         }
       }
     }
-  }, [EditorRef, props, session, loading])
+  }, [EditorRef, props, session, session])
 
 return <>
       <CodeMirrorEditor

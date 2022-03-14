@@ -1,4 +1,4 @@
-import { signIn, useSession } from 'next-auth/client'
+import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import React from 'react'
 import { Icon, Label, List, Menu, Popup, Image } from 'semantic-ui-react'
@@ -13,9 +13,9 @@ interface Props {
 }
 
 const Nav = (props: Props) => {
-    const [ session, loading ] = useSession()
+    const { data: session } = useSession()
 
-    if (loading) {
+    if (session) {
         return <>loading</>
     }
 

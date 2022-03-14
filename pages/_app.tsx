@@ -1,4 +1,4 @@
-import { Provider } from 'next-auth/client'
+import { SessionProvider as Provider } from 'next-auth/react'
 
 import '../styles/globals.css'
 import 'semantic-ui-css/semantic.min.css'

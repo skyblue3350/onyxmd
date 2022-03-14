@@ -1,10 +1,10 @@
 import NextAuth from 'next-auth'
-import Providers from 'next-auth/providers'
+import GitHubProvider from 'next-auth/providers/github'
 
 const providers = []
 
 if ((process.env.ONYXMD_GITHUB_ENABLED || '').toLocaleLowerCase() === 'true') {
-    providers.push(Providers.GitHub({
+    providers.push(GitHubProvider({
         clientId: process.env.ONYXMD_GITHUB_CLIENT_ID,
         clientSecret: process.env.ONYXMD_GITHUB_CLIENT_SECRET,
     }))
