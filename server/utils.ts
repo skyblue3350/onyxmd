@@ -18,8 +18,9 @@ const wsReadyStateOpen = 1
 
 const redisPersistence = new RedisPersistence({
   redisOpts: {
-    host: 'localhost',
-    port: 6379,
+    host: process.env.ONYXMD_REDIS_HOST,
+    port: parseInt(process.env.ONYXMD_REDIS_PORT) || 6379,
+    password: process.env.ONYXMD_REDIS_PASSWORD,
   }
 })
 
