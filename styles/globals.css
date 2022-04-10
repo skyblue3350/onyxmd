@@ -48,6 +48,8 @@ a {
   z-index: 3;
 }
 
+.cm-editor { height: 100% }
+
 .CodeMirror-css {
   height: calc(100% - 50px) !important;
   width: 100%;
