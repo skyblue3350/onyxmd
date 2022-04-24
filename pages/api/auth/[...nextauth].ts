@@ -29,4 +29,7 @@ if ((process.env.ONYXMD_GENERIC_AUTH_ENABLED || '').toLocaleLowerCase() === 'tru
     })
 }
 
-export default NextAuth({providers})
+export default NextAuth({
+    providers,
+    secret: process.env.ONYXMD_AUTH_SECRET,
+})
